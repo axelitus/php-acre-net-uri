@@ -13,6 +13,12 @@
 namespace axelitus\Acre\Net\Uri;
 
 use InvalidArgumentException;
+use axelitus\Acre\Net\Uri\Path as Path;
+
+/**
+ * Requires axelitus\Acre\Common package
+ */
+use axelitus\Acre\Common\Str as Str;
 
 /**
  * Uri Class
@@ -32,9 +38,9 @@ class Uri
   (?#userinfo)(?:(?P<userinfo>.+)@)?
   (?#host)(?P<host>(?:(?#named|IPv4)[A-Za-z0-9\-._~%]+|(?#IPv6)\[[A-Fa-f0-9:.]+\]|(?#IPvFuture)\[v[A-Fa-f0-9][A-Za-z0-9\-._~%!$&\'()*+,;=:]+\])?)
   (?#port)(?::(?P<port>[0-9]+))?
-))?
+(?::.+)?))?
 (?#path)(?:\/?(?P<path>(?:[A-Za-z0-9\-._~%!$&\'()*+,;=@]+\/?)*))?
-(?#query)(?:\?(?P<query>[A-Za-z0-9\-._~%!$&\'()*+,;=:@\/?]*))?
+(?#query)(?:\??(?P<query>(?:[A-Za-z0-9\-._~%!$\'()*+,;:@\/?]*(?:=[A-Za-z0-9\-._~%!$\'()*+,;:@\/?]*)?)(?:&[A-Za-z0-9\-._~%!$\'()*+,;:@\/?]*(?:=[A-Za-z0-9\-._~%!$\'()*+,;:@\/?]*)?)*))?
 (?#fragment)(?:\#(?P<fragment>[A-Za-z0-9\-._~%!$&\'()*+,;=:@\/?]*))?$/x
 REGEX;
 
@@ -58,7 +64,7 @@ REGEX;
 
     public static function forge($components = '')
     {
-        if (!is_string($components) or !is_array($components)) {
+        if (!is_string($components) and !is_array($components)) {
             throw new InvalidArgumentException("The \$components parameter must be a string or an array.");
         }
 
@@ -92,10 +98,13 @@ REGEX;
     protected function build()
     {
         $uri = $this->_scheme;
-        $uri .= (string)$this->_authority;
-        $uri .= (string)$this->_path;
+        $uri .= ($uri != '' ? static::SCHEME_SEPARATOR : '').(string)$this->_authority;
+
+        $path = (string)$this->_path;
+        $uri .= (($uri != '' and !Str::beginsWith($path, Path::SEPARATOR)) ? Path::SEPARATOR : '').$path;
+
         $uri .= (string)$this->_query;
-        $uri .= ($this->_fragment != '') ? '#'.$this->_fragment : '';
+        $uri .= $this->_fragment != '' ? '#'.$this->_fragment : '';
 
         return $uri;
     }
