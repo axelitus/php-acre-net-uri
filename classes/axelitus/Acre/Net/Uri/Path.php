@@ -29,14 +29,29 @@ use InvalidArgumentException;
  */
 class Path
 {
+    /**
+     * @var string  The path segments separators
+     */
     const SEPARATOR = '/';
+
+    /**
+     * @var string  The name capturing regex pattern to parse a path string
+     */
     const REGEX = <<<REGEX
 /^(?#path)(?:\/?(?P<path>(?:[A-Za-z0-9\-._~%!$&\'()*+,;=@]+\/?)*))?(?:\?|\#|$)/x
 REGEX;
 
-
+    /**
+     * @var array   The path segments
+     */
     protected $_segments = array();
 
+    /**
+     * Protected constructor to prevent instantiation outside this class.
+     *
+     * @param string|array  $path   A path-formatted string or an array of strings containing the path segments
+     * @throws \InvalidArgumentException
+     */
     protected function __construct($path)
     {
         if(is_string($path)) {
@@ -52,6 +67,14 @@ REGEX;
         }
     }
 
+    /**
+     * Forges a new instance of the Path class.
+     *
+     * @static
+     * @param string|array  $path   A path-formatted string or an array of strings containing the path segments
+     * @return Path     The new instance
+     * @throws \InvalidArgumentException
+     */
     public static function forge($path)
     {
         if(!is_string($path) and !is_array($path)) {
@@ -63,6 +86,11 @@ REGEX;
 
     // TODO: Implement ArrayAccess and Iterator
 
+    /**
+     * Builds the full path-formatted string with the current values.
+     *
+     * @return string   The path-formatted string
+     */
     protected function build()
     {
         $path = '';
@@ -73,6 +101,11 @@ REGEX;
         return Str::sub($path, 0, -1);
     }
 
+    /**
+     * The toString magic function to get a string representation of the object.
+     *
+     * @return string   The string representation of this object
+     */
     public function __toString()
     {
         return $this->build();
