@@ -28,10 +28,21 @@ use axelitus\Acre\Common\Num as Num;
  * @category    Net\Uri
  * @author      Axel Pardemann (dev@axelitus.mx)
  */
-class Authority extends MagicObject
+final class Authority extends MagicObject
 {
+    /**
+     * @var string      The userinfo segment separator
+     */
     const USERINFO_SEPARATOR = '@';
+
+    /**
+     * @var string      The port segment separator
+     */
     const PORT_SEPARATOR = ':';
+
+    /**
+     * @var string      The name capturing regex pattern to parse an authority string
+     */
     const REGEX = <<<REGEX
 /^(?:(?#authority)(?:\/\/)?
   (?#userinfo)(?:(?P<userinfo>.+)@)?
@@ -40,18 +51,45 @@ class Authority extends MagicObject
 )?(?:\/|\?|\#|$)/x
 REGEX;
 
-
+    /**
+     * @var string      The userinfo segment
+     */
     protected $_userinfo = '';
+
+    /**
+     * @var string      The host segment
+     */
     protected $_host = '';
+
+    /**
+     * @var int         The port segment (as an integer)
+     */
     protected $_port = 0;
 
-    protected function __construct($components)
+    /**
+     * Protected constructor to prevent instantiation outside this class.
+     *
+     * @param array $components     An associative array containing zero or more components (userinfo, host and/or port)
+     *                              Other unknown entries in the array will be ignored.
+     */
+    protected function __construct(array $components)
     {
         foreach ($components as $component => $value) {
-            $this->{$component} = $value;
+            if ($this->hasProperty($component) and $this->hasPropertySetter($component)) {
+                $this->{$component} = $value;
+            }
         }
     }
 
+    /**
+     * Forges a new instance of the Authority class.
+     *
+     * @static
+     * @param string $host      The authority host segment value
+     * @param int    $port      The authority port segment value
+     * @param string $userinfo  The authority userinfo segment value
+     * @return Authority    The new Authority object
+     */
     public static function forge($host = '', $port = 0, $userinfo = '')
     {
         if (is_array($host)) {
@@ -61,6 +99,14 @@ REGEX;
         }
     }
 
+    /**
+     * Parses an authority formatted string into an Authority class.
+     *
+     * @static
+     * @param string    $authority    The authority-formatted string
+     * @return Authority    The new Authority object
+     * @throws \InvalidArgumentException
+     */
     public static function parse($authority)
     {
         if (!is_string($authority)) {
@@ -80,6 +126,14 @@ REGEX;
         return static::Forge($components);
     }
 
+    /**
+     * Userinfo segment setter.
+     * The new value is not format-validated.
+     *
+     * @param string $userinfo     The userinfo segment value to set
+     * @return Authority    This instance for chaining
+     * @throws \InvalidArgumentException
+     */
     public function setUserinfo($userinfo)
     {
         if (!is_string($userinfo)) {
@@ -91,11 +145,24 @@ REGEX;
         return $this;
     }
 
+    /**
+     * Userinfo segment getter.
+     *
+     * @return string   The userinfo segment value
+     */
     public function getUserinfo()
     {
         return $this->_userinfo;
     }
 
+    /**
+     * Host segment setter.
+     * The new value is not format-validated.
+     *
+     * @param string    $host   The host segment value to set
+     * @return Authority    This instance for chaining
+     * @throws \InvalidArgumentException
+     */
     public function setHost($host)
     {
         if (!is_string($host)) {
@@ -107,11 +174,23 @@ REGEX;
         return $this;
     }
 
+    /**
+     * Host segment getter.
+     *
+     * @return string   The host segment value
+     */
     public function getHost()
     {
         return $this->_host;
     }
 
+    /**
+     * Port segment setter.
+     *
+     * @param int $port    The port segment value to set
+     * @return Authority    This instance for chaining
+     * @throws \InvalidArgumentException
+     */
     public function setPort($port)
     {
         if (!Num::isInt($port)) {
@@ -123,11 +202,21 @@ REGEX;
         return $this;
     }
 
+    /**
+     * Port segment getter.
+     *
+     * @return int      The port segment value
+     */
     public function getPort()
     {
         return $this->_port;
     }
 
+    /**
+     * Builds the full authority-formatted string with the current values.
+     *
+     * @return string   The authority-formatted string
+     */
     protected function build()
     {
         $userinfo = $this->_userinfo.(($this->_userinfo != '') ? static::USERINFO_SEPARATOR : '');
@@ -138,6 +227,11 @@ REGEX;
         return ($authority != '') ? '//'.$authority : $authority;
     }
 
+    /**
+     * The toString magic function to get a string representation of the object.
+     *
+     * @return string   The string representation of this object
+     */
     public function __toString()
     {
         return $this->build();
