@@ -15,7 +15,9 @@
     ],
     "minimum-stability": "dev",
     "require": {
-        "php": ">=5.3.0"
+        "php": ">=5.3.0",
+
+        "axelitus/acre-common": "dev-develop"
     },
     "autoload": {
         "psr-0": {
