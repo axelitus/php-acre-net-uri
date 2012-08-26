@@ -12,12 +12,20 @@
 
 namespace axelitus\Acre\Net\Uri;
 
+use Countable;
+use ArrayAccess;
+use Iterator;
+
 /**
  * Requires axelitus\Acre\Common package
  */
+use axelitus\Acre\Common\Magic_Object as MagicObject;
 use axelitus\Acre\Common\Str as Str;
 
 use InvalidArgumentException;
+use Countable;
+use ArrayAccess;
+use Iterator;
 
 /**
  * Path Class
@@ -27,7 +35,7 @@ use InvalidArgumentException;
  * @category    Net\Uri
  * @author      Axel Pardemann (dev@axelitus.mx)
  */
-class Path
+class Path extends MagicObject implements Countable, ArrayAccess, Iterator
 {
     /**
      * @var string  The path segments separators
@@ -50,20 +58,13 @@ REGEX;
      * Protected constructor to prevent instantiation outside this class.
      *
      * @param string|array  $path   A path-formatted string or an array of strings containing the path segments
-     * @throws \InvalidArgumentException
      */
     protected function __construct($path)
     {
         if(is_string($path)) {
             $this->_segments = explode(static::SEPARATOR, $path);
         } elseif(is_array($path)) {
-            foreach($path as $segment) {
-                if(!is_string($segment)) {
-                    throw new InvalidArgumentException("All path segments must be strings.");
-                }
-
-                $this->_segments[] = $segment;
-            }
+            $this->setSegments($path);
         }
     }
 
@@ -84,7 +85,164 @@ REGEX;
         return new static($path);
     }
 
-    // TODO: Implement ArrayAccess and Iterator
+    /**
+     * Segments setter.
+     *
+     * @param array $segments   The new segments
+     * @throws \InvalidArgumentException
+     */
+    public function setSegments(array $segments)
+    {
+        $this->_segments = array();
+        foreach($segments as $segment) {
+            if(!is_string($segment)) {
+                throw new InvalidArgumentException("All path segments must be strings.");
+            }
+
+            $this->_segments[] = $segment;
+        }
+    }
+
+    /**
+     * Segments getter.
+     *
+     * @return array    The path segments
+     */
+    public function getSegments()
+    {
+        return $this->_segments;
+    }
+
+    //<editor-fold desc="Countable Interface">
+    /**
+     * Implements Countable interface
+     *
+     * @author  FuelPHP (http://fuelphp.com)
+     * @see     FuelPHP Kernel Package (http://packagist.org/packages/fuel/core)
+     * @return  int
+     */
+    public function count()
+    {
+        return count($this->_segments);
+    }
+    //</editor-fold>
+
+    //<editor-fold desc="ArrayAccess Interface">
+    /**
+     * Implements ArrayAccess Interface
+     *
+     * @author  FuelPHP (http://fuelphp.com)
+     * @see     FuelPHP Kernel Package (http://packagist.org/packages/fuel/core)
+     * @param   string|int  $offset
+     * @return  bool
+     */
+    public function offsetExists($offset)
+    {
+        return array_key_exists($offset, $this->_segments);
+    }
+
+    /**
+     * Implements ArrayAccess Interface
+     *
+     * @author  FuelPHP (http://fuelphp.com)
+     * @see     FuelPHP Kernel Package (http://packagist.org/packages/fuel/core)
+     * @param   string|int  $offset
+     * @return  mixed
+     */
+    public function offsetGet($offset)
+    {
+        return $this->_segments[$offset];
+    }
+
+    /**
+     * Implements ArrayAccess Interface
+     *
+     * @author  FuelPHP (http://fuelphp.com)
+     * @see     FuelPHP Kernel Package (http://packagist.org/packages/fuel/core)
+     * @param   string|int  $offset
+     * @param   mixed       $value
+     * @return  void
+     */
+    public function offsetSet($offset, $value)
+    {
+        $this->_segments[$offset] = $value;
+    }
+
+    /**
+     * Implements ArrayAccess Interface
+     *
+     * @author  FuelPHP (http://fuelphp.com)
+     * @see     FuelPHP Kernel Package (http://packagist.org/packages/fuel/core)
+     * @param   string|int  $offset
+     * @return  void
+     */
+    public function offsetUnset($offset)
+    {
+        unset($this->_segments[$offset]);
+    }
+    //</editor-fold>
+
+    //<editor-fold desc="Iterator Interface">
+    /**
+     * Implements Iterator Interface
+     *
+     * @author  FuelPHP (http://fuelphp.com)
+     * @see     FuelPHP Kernel Package (http://packagist.org/packages/fuel/core)
+     * @return  mixed
+     */
+    public function current()
+    {
+        return current($this->_segments);
+    }
+
+    /**
+     * Implements Iterator Interface
+     *
+     * @author  FuelPHP (http://fuelphp.com)
+     * @see     FuelPHP Kernel Package (http://packagist.org/packages/fuel/core)
+     * @return  mixed
+     */
+    public function key()
+    {
+        return key($this->_segments);
+    }
+
+    /**
+     * Implements Iterator Interface
+     *
+     * @author  FuelPHP (http://fuelphp.com)
+     * @see     FuelPHP Kernel Package (http://packagist.org/packages/fuel/core)
+     * @return  void
+     */
+    public function next()
+    {
+        next($this->_segments);
+    }
+
+    /**
+     * Implements Iterator Interface
+     *
+     * @author  FuelPHP (http://fuelphp.com)
+     * @see     FuelPHP Kernel Package (http://packagist.org/packages/fuel/core)
+     * @return  mixed
+     */
+    public function rewind()
+    {
+        return reset($this->_segments);
+    }
+
+    /**
+     * Implements Iterator Interface
+     *
+     * @author  FuelPHP (http://fuelphp.com)
+     * @see     FuelPHP Kernel Package (http://packagist.org/packages/fuel/core)
+     * @return  bool
+     */
+    public function valid()
+    {
+        return !is_null($this->key());
+    }
+    //</editor-fold>
 
     /**
      * Builds the full path-formatted string with the current values.
