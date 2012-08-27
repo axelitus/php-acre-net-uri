@@ -160,6 +160,7 @@ REGEX;
     /**
      * Implements Countable interface
      *
+     * @see     http://fr.php.net/manual/en/class.countable.php     The Countable interface
      * @return  int
      */
     public function count()
@@ -173,7 +174,8 @@ REGEX;
     /**
      * Implements ArrayAccess Interface
      *
-     * @param   string|int  $offset
+     * @see     http://php.net/manual/en/class.arrayaccess.php      The ArrayAccess interface
+     * @param   mixed   $offset
      * @return  bool
      */
     public function offsetExists($offset)
@@ -184,7 +186,8 @@ REGEX;
     /**
      * Implements ArrayAccess Interface
      *
-     * @param   string|int  $offset
+     * @see     http://php.net/manual/en/class.arrayaccess.php      The ArrayAccess interface
+     * @param   mixed   $offset
      * @return  mixed
      */
     public function offsetGet($offset)
@@ -195,10 +198,9 @@ REGEX;
     /**
      * Implements ArrayAccess Interface
      *
-     * @author  FuelPHP (http://fuelphp.com)
-     * @see     FuelPHP Kernel Package (http://packagist.org/packages/fuel/core)
-     * @param   string|int  $offset
-     * @param   mixed       $value
+     * @see     http://php.net/manual/en/class.arrayaccess.php      The ArrayAccess interface
+     * @param   mixed   $offset
+     * @param   mixed   $value
      * @return  void
      */
     public function offsetSet($offset, $value)
@@ -209,7 +211,8 @@ REGEX;
     /**
      * Implements ArrayAccess Interface
      *
-     * @param   string|int  $offset
+     * @see     http://php.net/manual/en/class.arrayaccess.php      The ArrayAccess interface
+     * @param   mixed   $offset
      * @return  void
      */
     public function offsetUnset($offset)
@@ -223,6 +226,7 @@ REGEX;
     /**
      * Implements Iterator Interface
      *
+     * @see     http://www.php.net/manual/en/class.iterator.php     The Iterator interface
      * @return  mixed
      */
     public function current()
@@ -233,7 +237,8 @@ REGEX;
     /**
      * Implements Iterator Interface
      *
-     * @return  mixed
+     * @see     http://www.php.net/manual/en/class.iterator.php     The Iterator interface
+     * @return  int|string
      */
     public function key()
     {
@@ -243,6 +248,7 @@ REGEX;
     /**
      * Implements Iterator Interface
      *
+     * @see     http://www.php.net/manual/en/class.iterator.php     The Iterator interface
      * @return  void
      */
     public function next()
@@ -253,23 +259,24 @@ REGEX;
     /**
      * Implements Iterator Interface
      *
-     * @return  mixed
+     * @see     http://www.php.net/manual/en/class.iterator.php     The Iterator interface
+     * @return  void
      */
     public function rewind()
     {
-        return reset($this->_segments);
+        reset($this->_segments);
     }
 
     /**
      * Implements Iterator Interface
      *
+     * @see     http://www.php.net/manual/en/class.iterator.php     The Iterator interface
      * @return  bool
      */
     public function valid()
     {
         return !is_null($this->key());
     }
-
     //</editor-fold>
 
     /**
