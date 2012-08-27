@@ -176,6 +176,21 @@ REGEX;
     }
 
     /**
+     * Scheme setter
+     *
+     * @param string $scheme
+     * @throws \InvalidArgumentException
+     */
+    public function setScheme($scheme)
+    {
+        if (!is_string($scheme)) {
+            throw new InvalidArgumentException("The \$scheme parameter must be a string.");
+        }
+
+        $this->_scheme = $scheme;
+    }
+
+    /**
      * Scheme getter.
      *
      * @return string   The scheme value
@@ -183,6 +198,16 @@ REGEX;
     public function getScheme()
     {
         return $this->_scheme;
+    }
+
+    /**
+     * Authority setter.
+     *
+     * @param Authority $authority
+     */
+    public function setAuthority(Authority $authority)
+    {
+        $this->_authority = $authority;
     }
 
     /**
@@ -197,6 +222,16 @@ REGEX;
     }
 
     /**
+     * Path setter.
+     *
+     * @param Path $path
+     */
+    public function setPath(Path $path)
+    {
+        $this->_path = $path;
+    }
+
+    /**
      * Path getter.
      *
      * @param bool $asString    Whether to return the object as a string
@@ -208,6 +243,16 @@ REGEX;
     }
 
     /**
+     * Query setter.
+     *
+     * @param Query $query
+     */
+    public function setQuery(Query $query)
+    {
+        $this->_query = $query;
+    }
+
+    /**
      * Query getter.
      *
      * @param bool $asString    Whether to return the object as a string
@@ -216,6 +261,21 @@ REGEX;
     public function getQuery($asString = true)
     {
         return ($asString) ? (string)$this->_query : $this->_query;
+    }
+
+    /**
+     * Fragment setter.
+     *
+     * @param string $fragment
+     * @throws \InvalidArgumentException
+     */
+    public function setFragment($fragment)
+    {
+        if (!is_string($fragment)) {
+            throw new InvalidArgumentException("The \$fragment parameter must be a string.");
+        }
+
+        $this->_fragment = $fragment;
     }
 
     /**
