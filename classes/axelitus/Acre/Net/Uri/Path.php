@@ -53,7 +53,7 @@ REGEX;
     /**
      * Protected constructor to prevent instantiation outside this class.
      *
-     * @param array  $path   Ann array of strings containing the path segments
+     * @param array  $path   An array of strings containing the path segments
      */
     protected function __construct(array $path)
     {
@@ -68,7 +68,7 @@ REGEX;
      * @return Path     The new instance
      * @throws \InvalidArgumentException
      */
-    public static function forge($path)
+    public static function forge($path = array())
     {
         if (is_string($path)) {
             return static::parse($path);
@@ -93,9 +93,7 @@ REGEX;
             throw new InvalidArgumentException("The \$path parameter is not in the correct format.");
         }
 
-        if ($path != '') {
-            $segments = explode(static::SEPARATOR, isset($matches['path']) ? $matches['path'] : array());
-        }
+        $segments = ($path != '')? explode(static::SEPARATOR, isset($matches['path']) ? $matches['path'] : array()) : array();
 
         return static::forge($segments);
     }
