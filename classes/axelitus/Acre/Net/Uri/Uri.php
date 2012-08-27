@@ -18,6 +18,7 @@ use axelitus\Acre\Net\Uri\Path as Path;
 /**
  * Requires axelitus\Acre\Common package
  */
+use axelitus\Acre\Common\Magic_Object as MagicObject;
 use axelitus\Acre\Common\Str as Str;
 
 /**
@@ -28,7 +29,7 @@ use axelitus\Acre\Common\Str as Str;
  * @category    Net\Uri
  * @author      Axel Pardemann (dev@axelitus.mx)
  */
-class Uri
+class Uri extends MagicObject
 {
     const SCHEME_SEPARATOR = ':';
     const FRAGMENT_SEPARATOR = '#';
@@ -39,7 +40,7 @@ class Uri
   (?#host)(?P<host>(?:(?#named|IPv4)[A-Za-z0-9\-._~%]+|(?#IPv6)\[[A-Fa-f0-9:.]+\]|(?#IPvFuture)\[v[A-Fa-f0-9][A-Za-z0-9\-._~%!$&\'()*+,;=:]+\])?)
   (?#port)(?::(?P<port>[0-9]+))?
 (?::.+)?))?
-(?#path)(?:\/?(?P<path>(?:[A-Za-z0-9\-._~%!$&\'()*+,;=@]+\/?)*))?
+(?#path)(?:(?P<path>\/?(?:[A-Za-z0-9\-._~%!$&\'()*+,;=@]+\/?)*))?
 (?#query)(?:\??(?P<query>(?:[A-Za-z0-9\-._~%!$\'()*+,;:@\/?]*(?:=[A-Za-z0-9\-._~%!$\'()*+,;:@\/?]*)?)(?:&[A-Za-z0-9\-._~%!$\'()*+,;:@\/?]*(?:=[A-Za-z0-9\-._~%!$\'()*+,;:@\/?]*)?)*))?
 (?#fragment)(?:\#(?P<fragment>[A-Za-z0-9\-._~%!$&\'()*+,;=:@\/?]*))?$/x
 REGEX;
@@ -50,7 +51,12 @@ REGEX;
     protected $_query = null;
     protected $_fragment = '';
 
-    protected function __construct($components = '')
+    /**
+     * @var null    Virtual property not actually used
+     */
+    protected $_components = null;
+
+    protected function __construct(array $components)
     {
         $components = is_string($components) ? static::parse($components) : $components;
         $this->_scheme = $components['scheme'];
@@ -64,35 +70,91 @@ REGEX;
 
     public static function forge($components = '')
     {
-        if (!is_string($components) and !is_array($components)) {
+        if (is_string($components)) {
+            return static::parse($components);
+        } elseif (is_array($components)) {
+            return new static($components);
+        } else {
             throw new InvalidArgumentException("The \$components parameter must be a string or an array.");
         }
-
-        return new static($components);
     }
 
+    /**
+     * Parses an URI if valid and return a components array.
+     *
+     * @static
+     * @param $uri      The URI to parse
+     * @return Uri
+     * @throws \InvalidArgumentException
+     */
     public static function parse($uri)
     {
         if (!is_string($uri)) {
             throw new InvalidArgumentException("The \$uri parameter must be a string.");
         }
 
-        preg_match(static::REGEX, $uri, $matches);
+        if (!Uri::validate($uri, $matches)) {
+            throw new InvalidArgumentException("The given URI is not a valid formatted URI.");
+        }
 
         $components = array(
-            'scheme'    => $matches['scheme'],
-            'authority' => $matches['authority'],
-            'path'      => $matches['path'],
-            'query'     => $matches['query'],
-            'fragment'  => $matches['fragment']
+            'scheme'    => isset($matches['scheme']) ? $matches['scheme'] : '',
+            'authority' => isset($matches['authority']) ? $matches['authority'] : '',
+            'path'      => isset($matches['path']) ? $matches['path'] : '',
+            'query'     => isset($matches['query']) ? $matches['query'] : '',
+            'fragment'  => isset($matches['fragment']) ? $matches['fragment'] : ''
         );
 
-        return $components;
+        return static::forge($components);
     }
 
-    public static function validate($uri)
+    /**
+     * Tests if the given URI is valid (using the regex). It can additionally return the named capturing group(s)
+     * using the $matches parameter as a reference.
+     *
+     * @param string        $uri          The URI to test for validity
+     * @param array|null    $matches      The named capturing groups from the match
+     * @return bool     Whether the given URI is valid
+     */
+    public static function validate($uri, &$matches)
     {
-        return (bool)preg_match(static::REGEX, $uri);
+        return (bool)preg_match(static::REGEX, $uri, $matches);
+    }
+
+    public function getScheme()
+    {
+        return $this->_scheme;
+    }
+
+    public function getAuthority($asString = true)
+    {
+        return ($asString) ? (string)$this->_authority : $this->_authority;
+    }
+
+    public function getPath($asString = true)
+    {
+        return ($asString) ? (string)$this->_path : $this->_path;
+    }
+
+    public function getQuery($asString = true)
+    {
+        return ($asString) ? (string)$this->_query : $this->_query;
+    }
+
+    public function getFragment()
+    {
+        return $this->_fragment;
+    }
+
+    public function getComponents($objAsStrings = true)
+    {
+        return array(
+            'scheme'    => $this->_scheme,
+            'authority' => $this->getAuthority($objAsStrings),
+            'path'      => $this->getPath($objAsStrings),
+            'query'     => $this->getQuery($objAsStrings),
+            'fragment'  => $this->_fragment
+        );
     }
 
     protected function build()
@@ -112,10 +174,5 @@ REGEX;
     public function __toString()
     {
         return $this->build();
-    }
-
-    public function isValid()
-    {
-
     }
 }
