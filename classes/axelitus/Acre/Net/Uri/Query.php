@@ -102,7 +102,7 @@ REGEX;
         if ($query != '') {
             $queries = array_map(function($query) use (&$assoc)
             {
-                list($key, $value) = explode(static::VALUE_SEPARATOR, $query) + array(null, null);
+                list($key, $value) = explode(Query::VALUE_SEPARATOR, $query) + array(null, null);
                 $assoc[$key] = $value;
                 return array($key => $value);
             }, explode(static::PAIR_SEPARATOR, isset($matches['query']) ? $matches['query'] : array()));
