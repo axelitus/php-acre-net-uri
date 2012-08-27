@@ -5,7 +5,7 @@
  * @package     axelitus\Acre\Net\Uri
  * @version     0.1
  * @author      Axel Pardemann (dev@axelitus.mx)
- * @license     MIT License
+ * @license     MIT License     http://opensource.org/licenses/mit-license.php
  * @copyright   2012 - Axel Pardemann
  * @link        http://axelitus.mx/
  */
