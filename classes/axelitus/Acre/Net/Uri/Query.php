@@ -173,8 +173,6 @@ REGEX;
     /**
      * Implements Countable interface
      *
-     * @author  FuelPHP (http://fuelphp.com)
-     * @see     FuelPHP Kernel Package (http://packagist.org/packages/fuel/core)
      * @return  int
      */
     public function count()
@@ -188,8 +186,6 @@ REGEX;
     /**
      * Implements ArrayAccess Interface
      *
-     * @author  FuelPHP (http://fuelphp.com)
-     * @see     FuelPHP Kernel Package (http://packagist.org/packages/fuel/core)
      * @param   string|int  $offset
      * @return  bool
      */
@@ -201,8 +197,6 @@ REGEX;
     /**
      * Implements ArrayAccess Interface
      *
-     * @author  FuelPHP (http://fuelphp.com)
-     * @see     FuelPHP Kernel Package (http://packagist.org/packages/fuel/core)
      * @param   string|int  $offset
      * @return  mixed
      */
@@ -214,8 +208,6 @@ REGEX;
     /**
      * Implements ArrayAccess Interface
      *
-     * @author  FuelPHP (http://fuelphp.com)
-     * @see     FuelPHP Kernel Package (http://packagist.org/packages/fuel/core)
      * @param   string|int  $offset
      * @param   mixed       $value
      * @return  void
@@ -228,8 +220,6 @@ REGEX;
     /**
      * Implements ArrayAccess Interface
      *
-     * @author  FuelPHP (http://fuelphp.com)
-     * @see     FuelPHP Kernel Package (http://packagist.org/packages/fuel/core)
      * @param   string|int  $offset
      * @return  void
      */
@@ -244,8 +234,6 @@ REGEX;
     /**
      * Implements Iterator Interface
      *
-     * @author  FuelPHP (http://fuelphp.com)
-     * @see     FuelPHP Kernel Package (http://packagist.org/packages/fuel/core)
      * @return  mixed
      */
     public function current()
@@ -256,8 +244,6 @@ REGEX;
     /**
      * Implements Iterator Interface
      *
-     * @author  FuelPHP (http://fuelphp.com)
-     * @see     FuelPHP Kernel Package (http://packagist.org/packages/fuel/core)
      * @return  mixed
      */
     public function key()
@@ -268,8 +254,6 @@ REGEX;
     /**
      * Implements Iterator Interface
      *
-     * @author  FuelPHP (http://fuelphp.com)
-     * @see     FuelPHP Kernel Package (http://packagist.org/packages/fuel/core)
      * @return  void
      */
     public function next()
@@ -280,8 +264,6 @@ REGEX;
     /**
      * Implements Iterator Interface
      *
-     * @author  FuelPHP (http://fuelphp.com)
-     * @see     FuelPHP Kernel Package (http://packagist.org/packages/fuel/core)
      * @return  mixed
      */
     public function rewind()
@@ -292,8 +274,6 @@ REGEX;
     /**
      * Implements Iterator Interface
      *
-     * @author  FuelPHP (http://fuelphp.com)
-     * @see     FuelPHP Kernel Package (http://packagist.org/packages/fuel/core)
      * @return  bool
      */
     public function valid()
