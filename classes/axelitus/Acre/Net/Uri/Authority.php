@@ -100,30 +100,44 @@ REGEX;
     }
 
     /**
-     * Parses an authority formatted string into an Authority class.
+     * Parses an authority formatted string into an Authority object.
      *
      * @static
      * @param string    $authority    The authority-formatted string
-     * @return Authority    The new Authority object
+     * @return Authority    The new object
      * @throws \InvalidArgumentException
      */
     public static function parse($authority)
+    {
+        if (!static::validate($authority, $matches)) {
+            throw new InvalidArgumentException("The \$authority parameter is not in the correct format.");
+        }
+
+        $components = array(
+            'userinfo' => isset($matches['userinfo']) ? $matches['userinfo'] : '',
+            'host'     => isset($matches['host']) ? $matches['host'] : '',
+            'port'     => isset($matches['port']) ? (int)$matches['port'] : 0
+        );
+
+        return static::forge($components);
+    }
+
+    /**
+     * Tests if the given authority string is valid (using the regex). It can additionally return the named capturing
+     * group(s) using the $matches parameter as a reference.
+     *
+     * @static
+     * @param string        $authority  The path to test for validity
+     * @param array|null    $matches    The named capturing groups from the match
+     * @return bool     Whether the given path is valid
+     */
+    public static function validate($authority, &$matches = null)
     {
         if (!is_string($authority)) {
             throw new InvalidArgumentException("The \$authority parameter must be a string.");
         }
 
-        if (preg_match(static::REGEX, $authority, $matches) != 1) {
-            throw new InvalidArgumentException("The \$authority parameter is not in the correct format.");
-        }
-
-        $components = array(
-            'userinfo' => $matches['userinfo'],
-            'host'     => $matches['host'],
-            'port'     => (int)$matches['port'],
-        );
-
-        return static::Forge($components);
+        return (bool)preg_match(static::REGEX, $authority, $matches);
     }
 
     /**
