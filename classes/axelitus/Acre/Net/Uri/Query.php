@@ -73,7 +73,7 @@ REGEX;
      * @return Query     The new instance
      * @throws \InvalidArgumentException
      */
-    public static function forge($query)
+    public static function forge($query = array())
     {
         if (is_string($query)) {
             return static::parse($query);
@@ -304,6 +304,7 @@ REGEX;
             $query .= sprintf("%s%s%s%s", $item, static::VALUE_SEPARATOR, $value, static::PAIR_SEPARATOR);
         }
 
+        // Strip the last appended PAIR_SEPARATOR
         $query = Str::sub($query, 0, -1);
 
         return (($query != '') ? '?' : '').$query;
