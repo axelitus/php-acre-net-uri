@@ -12,6 +12,7 @@
 
 namespace axelitus\Acre\Net\Uri;
 
+use InvalidArgumentException;
 use Countable;
 use ArrayAccess;
 use Iterator;
@@ -21,11 +22,6 @@ use Iterator;
  */
 use axelitus\Acre\Common\Magic_Object as MagicObject;
 use axelitus\Acre\Common\Str as Str;
-
-use InvalidArgumentException;
-use Countable;
-use ArrayAccess;
-use Iterator;
 
 /**
  * Path Class
@@ -46,7 +42,7 @@ class Path extends MagicObject implements Countable, ArrayAccess, Iterator
      * @var string  The name capturing regex pattern to parse a path string
      */
     const REGEX = <<<REGEX
-/^(?#path)(?:\/?(?P<path>(?:[A-Za-z0-9\-._~%!$&\'()*+,;=@]+\/?)*))?(?:\?|\#|$)/x
+/^(?#path)(?:(?P<path>\/?(?:[A-Za-z0-9\-._~%!$&\'()*+,;=@]+\/?)*))?(?:\?|\#|$)/x
 REGEX;
 
     /**
@@ -57,15 +53,11 @@ REGEX;
     /**
      * Protected constructor to prevent instantiation outside this class.
      *
-     * @param string|array  $path   A path-formatted string or an array of strings containing the path segments
+     * @param array  $path   Ann array of strings containing the path segments
      */
-    protected function __construct($path)
+    protected function __construct(array $path)
     {
-        if(is_string($path)) {
-            $this->_segments = explode(static::SEPARATOR, $path);
-        } elseif(is_array($path)) {
-            $this->setSegments($path);
-        }
+        $this->setSegments($path);
     }
 
     /**
@@ -78,15 +70,56 @@ REGEX;
      */
     public static function forge($path)
     {
-        if(!is_string($path) and !is_array($path)) {
+        if (is_string($path)) {
+            return static::parse($path);
+        } elseif (is_array($path)) {
+            return new static($path);
+        } else {
             throw new InvalidArgumentException("The \$path parameter must be a string or an array of strings.");
         }
-
-        return new static($path);
     }
 
     /**
-     * Segments setter.
+     * Parses a path formatted string into a Path object.
+     *
+     * @static
+     * @param string    $path   The path-formatted string
+     * @return Authority    The new object
+     * @throws \InvalidArgumentException
+     */
+    public static function parse($path)
+    {
+        if (!static::validate($path, $matches)) {
+            throw new InvalidArgumentException("The \$path parameter is not in the correct format.");
+        }
+
+        if ($path != '') {
+            $segments = explode(static::SEPARATOR, isset($matches['path']) ? $matches['path'] : array());
+        }
+
+        return static::forge($segments);
+    }
+
+    /**
+     * Tests if the given path string is valid (using the regex). It can additionally return the named capturing
+     * group(s) using the $matches parameter as a reference.
+     *
+     * @static
+     * @param string        $path       The path to test for validity
+     * @param array|null    $matches    The named capturing groups from the match
+     * @return bool     Whether the given path is valid
+     */
+    public static function validate($path, &$matches = null)
+    {
+        if (!is_string($path)) {
+            throw new InvalidArgumentException("The \$path parameter must be a string.");
+        }
+
+        return (bool)preg_match(static::REGEX, $path, $matches);
+    }
+
+    /**
+     * Segments setter.  It replaces the segments array contents with the given array.
      *
      * @param array $segments   The new segments
      * @throws \InvalidArgumentException
@@ -94,12 +127,8 @@ REGEX;
     public function setSegments(array $segments)
     {
         $this->_segments = array();
-        foreach($segments as $segment) {
-            if(!is_string($segment)) {
-                throw new InvalidArgumentException("All path segments must be strings.");
-            }
-
-            $this->_segments[] = $segment;
+        foreach ($segments as $segment) {
+            $this->addSegment($segment);
         }
     }
 
@@ -111,6 +140,20 @@ REGEX;
     public function getSegments()
     {
         return $this->_segments;
+    }
+
+    /**
+     * Adds a segment to the segments array.
+     *
+     * @param $segment      The new segment
+     */
+    public function addSegment($segment)
+    {
+        if (!is_string($segment) or Str::contains($segment, static::SEPARATOR)) {
+            throw new InvalidArgumentException("The \$segment parameter must be a string and cannot contain the separator character '".static::SEPARATOR."'.");
+        }
+
+        $this->_segments[] = $segment;
     }
 
     //<editor-fold desc="Countable Interface">
@@ -125,6 +168,7 @@ REGEX;
     {
         return count($this->_segments);
     }
+
     //</editor-fold>
 
     //<editor-fold desc="ArrayAccess Interface">
@@ -180,6 +224,7 @@ REGEX;
     {
         unset($this->_segments[$offset]);
     }
+
     //</editor-fold>
 
     //<editor-fold desc="Iterator Interface">
@@ -242,6 +287,7 @@ REGEX;
     {
         return !is_null($this->key());
     }
+
     //</editor-fold>
 
     /**
@@ -252,7 +298,7 @@ REGEX;
     protected function build()
     {
         $path = '';
-        foreach($this->_segments as $segment) {
+        foreach ($this->_segments as $segment) {
             $path .= sprintf("%s%s", $segment, static::SEPARATOR);
         }
 
