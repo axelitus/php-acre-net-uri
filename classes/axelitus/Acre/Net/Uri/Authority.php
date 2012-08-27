@@ -227,7 +227,7 @@ REGEX;
     }
 
     /**
-     * Builds the full authority-formatted string with the current values.
+     * Builds the valid authority-formatted string with the current values.
      *
      * @return string   The authority-formatted string
      */

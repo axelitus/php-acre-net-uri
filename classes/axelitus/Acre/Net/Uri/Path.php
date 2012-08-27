@@ -278,7 +278,7 @@ REGEX;
     //</editor-fold>
 
     /**
-     * Builds the full path-formatted string with the current values.
+     * Builds the valid path-formatted string with the current values.
      *
      * @return string   The path-formatted string
      */

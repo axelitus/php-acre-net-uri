@@ -293,7 +293,7 @@ REGEX;
     //</editor-fold>
 
     /**
-     * Builds the full query-formatted string with the current values.
+     * Builds the valid query-formatted string with the current values.
      *
      * @return string   The query-formatted string
      */
