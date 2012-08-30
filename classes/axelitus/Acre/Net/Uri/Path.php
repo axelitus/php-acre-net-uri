@@ -15,7 +15,8 @@ namespace axelitus\Acre\Net\Uri;
 use InvalidArgumentException;
 use Countable;
 use ArrayAccess;
-use Iterator;
+use IteratorAggregate;
+use ArrayIterator;
 
 /**
  * Requires axelitus\Acre\Common package
@@ -31,7 +32,7 @@ use axelitus\Acre\Common\Str as Str;
  * @category    Net\Uri
  * @author      Axel Pardemann (dev@axelitus.mx)
  */
-class Path extends MagicObject implements Countable, ArrayAccess, Iterator
+class Path extends MagicObject implements Countable, ArrayAccess, IteratorAggregate
 {
     /**
      * @var string  The path segments separators
@@ -117,7 +118,7 @@ REGEX;
     }
 
     /**
-     * Segments setter.  It replaces the segments array contents with the given array.
+     * Segments setter.  It replaces the segments array contents with the given array segments.
      *
      * @param array $segments   The new segments
      * @throws \InvalidArgumentException
@@ -220,60 +221,16 @@ REGEX;
 
     //</editor-fold>
 
-    //<editor-fold desc="Iterator Interface">
+    //<editor-fold desc="IteratorAggregate Interface">
     /**
-     * Implements Iterator Interface
+     * Implements IteratorAggregate Interface
      *
-     * @see     http://www.php.net/manual/en/class.iterator.php     The Iterator interface
+     * @see     http://www.php.net/manual/en/class.iteratoraggregate.php     The IteratorAggregate interface
      * @return  mixed
      */
-    public function current()
+    public function getIterator()
     {
-        return current($this->_segments);
-    }
-
-    /**
-     * Implements Iterator Interface
-     *
-     * @see     http://www.php.net/manual/en/class.iterator.php     The Iterator interface
-     * @return  int|string
-     */
-    public function key()
-    {
-        return key($this->_segments);
-    }
-
-    /**
-     * Implements Iterator Interface
-     *
-     * @see     http://www.php.net/manual/en/class.iterator.php     The Iterator interface
-     * @return  void
-     */
-    public function next()
-    {
-        next($this->_segments);
-    }
-
-    /**
-     * Implements Iterator Interface
-     *
-     * @see     http://www.php.net/manual/en/class.iterator.php     The Iterator interface
-     * @return  void
-     */
-    public function rewind()
-    {
-        reset($this->_segments);
-    }
-
-    /**
-     * Implements Iterator Interface
-     *
-     * @see     http://www.php.net/manual/en/class.iterator.php     The Iterator interface
-     * @return  bool
-     */
-    public function valid()
-    {
-        return !is_null($this->key());
+        return new ArrayIterator($this->_segments);
     }
     //</editor-fold>
 
