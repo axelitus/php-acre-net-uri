@@ -17,7 +17,6 @@ use InvalidArgumentException;
 /**
  * Requires axelitus\Acre\Common package
  */
-use axelitus\Acre\Common\Magic_Object as MagicObject;
 use axelitus\Acre\Common\Num as Num;
 
 /**
@@ -28,7 +27,7 @@ use axelitus\Acre\Common\Num as Num;
  * @category    Net\Uri
  * @author      Axel Pardemann (dev@axelitus.mx)
  */
-final class Authority extends MagicObject
+final class Authority
 {
     /**
      * @var string      The userinfo segment separator
