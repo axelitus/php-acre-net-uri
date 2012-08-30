@@ -13,14 +13,15 @@
 namespace axelitus\Acre\Net\Uri;
 
 use InvalidArgumentException;
+use OutOfBoundsException;
 use Countable;
 use ArrayAccess;
-use Iterator;
+use IteratorAggregate;
+use ArrayIterator;
 
 /**
  * Requires axelitus\Acre\Common package
  */
-use axelitus\Acre\Common\Magic_Object as MagicObject;
 use axelitus\Acre\Common\Str as Str;
 
 /**
@@ -31,7 +32,7 @@ use axelitus\Acre\Common\Str as Str;
  * @category    Net\Uri
  * @author      Axel Pardemann (dev@axelitus.mx)
  */
-class Query extends MagicObject implements Countable, ArrayAccess, Iterator
+final class Query implements Countable, ArrayAccess, IteratorAggregate
 {
     /**
      * @var string      The key/value pairs separator
@@ -62,7 +63,7 @@ REGEX;
      */
     protected function __construct(array $query)
     {
-        $this->setPairs($query);
+        $this->load($query);
     }
 
     /**
@@ -94,6 +95,11 @@ REGEX;
      */
     public static function parse($query)
     {
+        return static::forge(static::parseAsArray($query));
+    }
+
+    public static function parseAsArray($query)
+    {
         if (!static::validate($query, $matches)) {
             throw new InvalidArgumentException("The \$query parameter is not in the correct format.");
         }
@@ -108,7 +114,7 @@ REGEX;
             }, explode(static::PAIR_SEPARATOR, isset($matches['query']) ? $matches['query'] : array()));
         }
 
-        return static::forge($assoc);
+        return $assoc;
     }
 
     /**
@@ -130,43 +136,78 @@ REGEX;
     }
 
     /**
-     * Pairs setter. It replaces the pairs array contents with the given array.
+     * Loads a new pairs array. It replaces the current pairs with the new ones.
      *
      * @param array $pairs      The new pairs associative array
      */
-    public function setPairs(array $pairs)
+    public function load(array $pairs)
     {
-        //var_dump($pairs); exit;
         $this->_pairs = array();
         foreach ($pairs as $key => $value) {
-            $this->addPair($key, $value);
+            $this->set($key, $value);
         }
     }
 
     /**
-     * Pairs getter.
+     * Sets an existing key to the given value.
      *
-     * @return array    The pairs associative array
-     */
-    public function getPairs()
-    {
-        return $this->_pairs;
-    }
-
-    /**
-     * Adds (or replaces) a key=value pair. Null values are replaced by an empty string.
-     *
-     * @param $key      The pair's key
-     * @param $value    The pair's value
+     * @param string    $key        The pair key
+     * @param string    $value      The pair value
+     * @throws \OutOfBoundsException
      * @throws \InvalidArgumentException
      */
-    public function addPair($key, $value)
+    public function set($key, $value)
     {
-        if (!is_string($key) or $key == '') {
-            throw new InvalidArgumentException("The \$key parameter must be a non empty string.");
+        if (!is_string($key)) {
+            throw new InvalidArgumentException("The \$key parameter must be a string.");
         }
 
         $this->_pairs[$key] = ($value !== null) ? $value : '';
+    }
+
+    /**
+     * Gets the pairs array or a single pair
+     *
+     * @param null|string   $key    The wanted pair key or null to get all pairs
+     * @return array|string     The pairs associative array or wanted pair
+     */
+    public function get($key = null)
+    {
+        if ($key === null) {
+            return $this->_pairs;
+        }
+
+        if (!$this->has($key)) {
+            throw new OutOfBoundsException(sprintf("Key %s does not exist.", $key));
+        }
+
+        return $this->_segments[$key];
+    }
+
+    /**
+     * Checks if the given key exists.
+     *
+     * @param string    $key    The key to check
+     * @return bool     Whether the key exists
+     */
+    public function has($key)
+    {
+        return array_key_exists($key, $this->_pairs);
+    }
+
+    /**
+     * Removes a pair.
+     *
+     * @param string    $key    The pair key to remove
+     * @throws \OutOfBoundsException
+     */
+    public function remove($key)
+    {
+        if (!$this->has($key)) {
+            throw new OutOfBoundsException(sprintf("Key %s does not exist.", $key));
+        }
+
+        unset($this->_pairs[$key]);
     }
 
     //<editor-fold desc="Countable Interface">
@@ -193,7 +234,7 @@ REGEX;
      */
     public function offsetExists($offset)
     {
-        return array_key_exists($offset, $this->_pairs);
+        return $this->has($offset);
     }
 
     /**
@@ -205,7 +246,7 @@ REGEX;
      */
     public function offsetGet($offset)
     {
-        return $this->_pairs[$offset];
+        return $this->get($offset);
     }
 
     /**
@@ -218,7 +259,7 @@ REGEX;
      */
     public function offsetSet($offset, $value)
     {
-        $this->_pairs[$offset] = $value;
+        $this->set($offset, $value);
     }
 
     /**
@@ -230,66 +271,23 @@ REGEX;
      */
     public function offsetUnset($offset)
     {
-        unset($this->_pairs[$offset]);
+        $this->remove($offset);
     }
 
     //</editor-fold>
 
-    //<editor-fold desc="Iterator Interface">
+    //<editor-fold desc="IteratorAggregate Interface">
     /**
-     * Implements Iterator Interface
+     * Implements IteratorAggregate Interface
      *
-     * @see     http://www.php.net/manual/en/class.iterator.php     The Iterator interface
+     * @see     http://www.php.net/manual/en/class.iteratoraggregate.php     The IteratorAggregate interface
      * @return  mixed
      */
-    public function current()
+    public function getIterator()
     {
-        return current($this->_pairs);
+        return new ArrayIterator($this->_pairs);
     }
 
-    /**
-     * Implements Iterator Interface
-     *
-     * @see     http://www.php.net/manual/en/class.iterator.php     The Iterator interface
-     * @return  int|string
-     */
-    public function key()
-    {
-        return key($this->_pairs);
-    }
-
-    /**
-     * Implements Iterator Interface
-     *
-     * @see     http://www.php.net/manual/en/class.iterator.php     The Iterator interface
-     * @return  void
-     */
-    public function next()
-    {
-        next($this->_pairs);
-    }
-
-    /**
-     * Implements Iterator Interface
-     *
-     * @see     http://www.php.net/manual/en/class.iterator.php     The Iterator interface
-     * @return  void
-     */
-    public function rewind()
-    {
-        reset($this->_pairs);
-    }
-
-    /**
-     * Implements Iterator Interface
-     *
-     * @see     http://www.php.net/manual/en/class.iterator.php     The Iterator interface
-     * @return  bool
-     */
-    public function valid()
-    {
-        return !is_null($this->key());
-    }
     //</editor-fold>
 
     /**
@@ -297,11 +295,15 @@ REGEX;
      *
      * @return string   The query-formatted string
      */
-    protected function build()
+    public function build($urlencode = true)
     {
         $query = '';
-        foreach ($this->_pairs as $item => $value) {
-            $query .= sprintf("%s%s%s%s", $item, static::VALUE_SEPARATOR, $value, static::PAIR_SEPARATOR);
+        foreach ($this->_pairs as $key => $value) {
+            if($urlencode) {
+                $key = urlencode($key);
+                $value = urlencode($value);
+            }
+            $query .= sprintf("%s%s%s%s", $key, static::VALUE_SEPARATOR, $value, static::PAIR_SEPARATOR);
         }
 
         // Strip the last appended PAIR_SEPARATOR

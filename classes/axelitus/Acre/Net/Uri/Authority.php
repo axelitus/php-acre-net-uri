@@ -18,6 +18,7 @@ use InvalidArgumentException;
  * Requires axelitus\Acre\Common package
  */
 use axelitus\Acre\Common\Num as Num;
+use axelitus\Acre\Common\Str as Str;
 
 /**
  * Authority Class
@@ -74,8 +75,8 @@ REGEX;
     protected function __construct(array $components)
     {
         foreach ($components as $component => $value) {
-            if ($this->hasProperty($component) and $this->hasPropertySetter($component)) {
-                $this->{$component} = $value;
+            if(Str::isOneOf($component, array('host', 'port', 'userinfo'))) {
+                $this->{'set'.$component}($value);
             }
         }
     }

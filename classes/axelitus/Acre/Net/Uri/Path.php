@@ -32,7 +32,7 @@ use axelitus\Acre\Common\Str as Str;
  * @category    Net\Uri
  * @author      Axel Pardemann (dev@axelitus.mx)
  */
-class Path implements Countable, ArrayAccess, IteratorAggregate
+final class Path implements Countable, ArrayAccess, IteratorAggregate
 {
     /**
      * @var string  The path segments separators
@@ -58,7 +58,7 @@ REGEX;
      */
     protected function __construct(array $path)
     {
-        $this->add($path);
+        $this->load($path);
     }
 
     /**
@@ -132,7 +132,7 @@ REGEX;
     }
 
     /**
-     * Loads a new segments array. It replaces the current segments with the new segments.
+     * Loads a new segments array. It replaces the current segments with the new ones.
      *
      * @param array $segments   The new segments
      * @throws \InvalidArgumentException
@@ -146,8 +146,8 @@ REGEX;
     /**
      * Sets an existing segment to the given value.
      *
-     * @param $index
-     * @param $segment
+     * @param int       $index      The segment index
+     * @param string    $segment    The segment value
      * @throws \OutOfBoundsException
      * @throws \InvalidArgumentException
      */
@@ -165,9 +165,10 @@ REGEX;
     }
 
     /**
-     * Gets the segments array or a segment
+     * Gets the segments array or a single segment
      *
-     * @return string|array    The path segments or wanted segment
+     * @param null|int  $index      The wanted segment index or null to get all segments
+     * @return array|string     The path segments or wanted segment
      */
     public function get($index = null)
     {
@@ -319,7 +320,7 @@ REGEX;
      *
      * @return string   The path-formatted string
      */
-    protected function build()
+    public function build()
     {
         $path = '';
         foreach ($this->_segments as $segment) {

@@ -47,6 +47,11 @@ class UriTest extends \PHPUnit_Framework_TestCase
         $uri = Uri::forge($expected);
         $output = (string)$uri;
         $this->assertEquals($expected, $output);
+
+        $expected = '*';
+        $uri = Uri::forge($expected);
+        $output = (string)$uri;
+        $this->assertEquals($expected, $output);
     }
 
     public function testUriValidate()
