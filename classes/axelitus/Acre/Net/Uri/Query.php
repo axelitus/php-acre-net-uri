@@ -93,12 +93,12 @@ REGEX;
      * @return Authority    The new object
      * @throws \InvalidArgumentException
      */
-    public static function parse($query)
+    public static function parse($query, $urldecode = true)
     {
         return static::forge(static::parseAsArray($query));
     }
 
-    public static function parseAsArray($query)
+    public static function parseAsArray($query, $urldecode = true)
     {
         if (!static::validate($query, $matches)) {
             throw new InvalidArgumentException("The \$query parameter is not in the correct format.");
@@ -106,9 +106,15 @@ REGEX;
 
         $assoc = array();
         if ($query != '') {
-            $queries = array_map(function($query) use (&$assoc)
+            $queries = array_map(function($query) use (&$assoc, $urldecode)
             {
                 list($key, $value) = explode(Query::VALUE_SEPARATOR, $query) + array(null, null);
+
+                if($urldecode) {
+                    $key = urldecode($key);
+                    $value = urldecode(($value));
+                }
+
                 $assoc[$key] = $value;
                 return array($key => $value);
             }, explode(static::PAIR_SEPARATOR, isset($matches['query']) ? $matches['query'] : array()));
@@ -156,10 +162,15 @@ REGEX;
      * @throws \OutOfBoundsException
      * @throws \InvalidArgumentException
      */
-    public function set($key, $value)
+    public function set($key, $value, $urldecode = true)
     {
         if (!is_string($key)) {
             throw new InvalidArgumentException("The \$key parameter must be a string.");
+        }
+
+        if($urldecode){
+            $key = urldecode($key);
+            $value = urldecode($value);
         }
 
         $this->_pairs[$key] = ($value !== null) ? $value : '';
@@ -171,7 +182,7 @@ REGEX;
      * @param null|string   $key    The wanted pair key or null to get all pairs
      * @return array|string     The pairs associative array or wanted pair
      */
-    public function get($key = null)
+    public function get($key = null, $urlencode = true)
     {
         if ($key === null) {
             return $this->_pairs;
@@ -181,7 +192,7 @@ REGEX;
             throw new OutOfBoundsException(sprintf("Key %s does not exist.", $key));
         }
 
-        return $this->_segments[$key];
+        return ($urlencode)? urlencode($this->_pairs[urldecode($key)]) : $this->_pairs[$key];
     }
 
     /**

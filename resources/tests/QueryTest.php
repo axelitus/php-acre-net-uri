@@ -34,5 +34,16 @@ class QueryTest extends \PHPUnit_Framework_TestCase
         $expected = '?myquery1=myva%3Flue1&myquery2=myvalue2&myquery3=';
         $output = (string) $query;
         $this->assertEquals($expected, $output);
+
+        $query = Query::forge();
+        $query->set('my?query', 'my%2Avalue');
+        $query->set('your%3Fquery', 'your*value');
+        $expected = '?my%3Fquery=my%2Avalue&your%3Fquery=your%2Avalue';
+        $output = (string) $query;
+        $this->assertEquals($expected, $output);
+
+        $expected = '?my?query=my*value&your?query=your*value';
+        $output = $query->build(false);
+        $this->assertEquals($expected, $output);
     }
 }
