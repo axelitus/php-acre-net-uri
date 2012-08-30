@@ -13,6 +13,7 @@
 namespace axelitus\Acre\Net\Uri;
 
 use InvalidArgumentException;
+use OutOfBoundsException;
 use Countable;
 use ArrayAccess;
 use IteratorAggregate;
@@ -21,7 +22,6 @@ use ArrayIterator;
 /**
  * Requires axelitus\Acre\Common package
  */
-use axelitus\Acre\Common\Magic_Object as MagicObject;
 use axelitus\Acre\Common\Str as Str;
 
 /**
@@ -32,7 +32,7 @@ use axelitus\Acre\Common\Str as Str;
  * @category    Net\Uri
  * @author      Axel Pardemann (dev@axelitus.mx)
  */
-class Path extends MagicObject implements Countable, ArrayAccess, IteratorAggregate
+class Path implements Countable, ArrayAccess, IteratorAggregate
 {
     /**
      * @var string  The path segments separators
@@ -58,7 +58,7 @@ REGEX;
      */
     protected function __construct(array $path)
     {
-        $this->setSegments($path);
+        $this->add($path);
     }
 
     /**
@@ -90,13 +90,27 @@ REGEX;
      */
     public static function parse($path)
     {
+        return static::forge(static::parseAsArray($path));
+    }
+
+    /**
+     * Parses a path formatted string into a segments array.
+     *
+     * @static
+     * @param string    $path   The path-formatted string
+     * @return array    The segments array
+     * @throws \InvalidArgumentException
+     */
+    public static function parseAsArray($path)
+    {
         if (!static::validate($path, $matches)) {
             throw new InvalidArgumentException("The \$path parameter is not in the correct format.");
         }
 
-        $segments = ($path != '')? explode(static::SEPARATOR, isset($matches['path']) ? $matches['path'] : array()) : array();
+        $segments = ($path != '') ? explode(static::SEPARATOR, isset($matches['path']) ? $matches['path'] : array())
+            : array();
 
-        return static::forge($segments);
+        return $segments;
     }
 
     /**
@@ -118,41 +132,106 @@ REGEX;
     }
 
     /**
-     * Segments setter.  It replaces the segments array contents with the given array segments.
+     * Loads a new segments array. It replaces the current segments with the new segments.
      *
      * @param array $segments   The new segments
      * @throws \InvalidArgumentException
      */
-    public function setSegments(array $segments)
+    public function load(array $segments)
     {
         $this->_segments = array();
-        foreach ($segments as $segment) {
-            $this->addSegment($segment);
+        $this->add($segments);
+    }
+
+    /**
+     * Sets an existing segment to the given value.
+     *
+     * @param $index
+     * @param $segment
+     * @throws \OutOfBoundsException
+     * @throws \InvalidArgumentException
+     */
+    public function set($index, $segment)
+    {
+        if (!$this->has($index)) {
+            throw new OutOfBoundsException(sprintf("Index %s does not exist.", $index));
+        }
+
+        if (!is_string($segment)) {
+            throw new InvalidArgumentException("The \$segment parameter must be a string.");
+        }
+
+        $this->_segments[$index] = $segment;
+    }
+
+    /**
+     * Gets the segments array or a segment
+     *
+     * @return string|array    The path segments or wanted segment
+     */
+    public function get($index = null)
+    {
+        if ($index === null) {
+            return $this->_segments;
+        }
+
+        if (!$this->has($index)) {
+            throw new OutOfBoundsException(sprintf("Index %s does not exist.", $index));
+        }
+
+        return $this->_segments[$index];
+    }
+
+    /**
+     * Checks if the given index exists.
+     *
+     * @param int   $index      The index to check
+     * @return bool     Whether the index exists
+     */
+    public function has($index)
+    {
+        return array_key_exists($index, $this->_segments);
+    }
+
+    /**
+     * Adds a new segment (or multiple segments) to the end of the segments array.
+     *
+     * @param string|array  $segment      The new segment(s)
+     */
+    public function add($segment)
+    {
+        if (!($is_string = is_string($segment)) and !is_array($segment)) {
+            throw new InvalidArgumentException("The \$segment parameter must be a string or an array of strings.");
+        }
+
+        $segments = $is_string ? static::parse($segment) : $segment;
+        foreach ($segments as $new_segment) {
+            if (!is_string($new_segment)) {
+                throw new InvalidArgumentException("The new segment must be a string.");
+            }
+
+            if (Str::contains($new_segment, static::SEPARATOR)) {
+                $this->add($new_segment);
+            } else {
+                $this->_segments[] = $new_segment;
+            }
         }
     }
 
     /**
-     * Segments getter.
+     * Removes a segment. The segments array re-indexes.
      *
-     * @return array    The path segments
+     * @param int   $index      The segment to remove
+     * @throws \OutOfBoundsException
      */
-    public function getSegments()
+    public function remove($index)
     {
-        return $this->_segments;
-    }
-
-    /**
-     * Adds a segment to the segments array.
-     *
-     * @param $segment      The new segment
-     */
-    public function addSegment($segment)
-    {
-        if (!is_string($segment) or Str::contains($segment, static::SEPARATOR)) {
-            throw new InvalidArgumentException("The \$segment parameter must be a string and cannot contain the separator character '".static::SEPARATOR."'.");
+        if (!$this->has($index)) {
+            throw new OutOfBoundsException(sprintf("Index %s does not exist.", $index));
         }
 
-        $this->_segments[] = $segment;
+        unset($this->_segments[$index]);
+        $this->_segments = array_Values($this->_segments);
     }
 
     //<editor-fold desc="Countable Interface">
@@ -179,7 +258,7 @@ REGEX;
      */
     public function offsetExists($offset)
     {
-        return array_key_exists($offset, $this->_segments);
+        $this->has($offset);
     }
 
     /**
@@ -191,7 +270,7 @@ REGEX;
      */
     public function offsetGet($offset)
     {
-        return $this->_segments[$offset];
+        return $this->get($offset);
     }
 
     /**
@@ -204,7 +283,7 @@ REGEX;
      */
     public function offsetSet($offset, $value)
     {
-        $this->_segments[$offset] = $value;
+        $this->set($offset, $value);
     }
 
     /**
@@ -216,7 +295,7 @@ REGEX;
      */
     public function offsetUnset($offset)
     {
-        unset($this->_segments[$offset]);
+       $this->remove($offset);
     }
 
     //</editor-fold>
@@ -232,6 +311,7 @@ REGEX;
     {
         return new ArrayIterator($this->_segments);
     }
+
     //</editor-fold>
 
     /**
