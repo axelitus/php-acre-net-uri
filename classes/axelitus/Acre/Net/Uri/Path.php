@@ -121,6 +121,7 @@ REGEX;
      * @param string        $path       The path to test for validity
      * @param array|null    $matches    The named capturing groups from the match
      * @return bool     Whether the given path is valid
+     * @throws \InvalidArgumentException
      */
     public static function validate($path, &$matches = null)
     {
