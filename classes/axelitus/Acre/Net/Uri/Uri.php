@@ -34,15 +34,15 @@ class Uri extends MagicObject
     const SCHEME_SEPARATOR = ':';
     const FRAGMENT_SEPARATOR = '#';
     const REGEX = <<<REGEX
-/^(?#scheme)(?:(?P<scheme>[A-Za-z][A-Za-z0-9+\-.]*):)?
-(?:(?#authority)\/\/(?P<authority>
-  (?#userinfo)(?:(?P<userinfo>.+)@)?
-  (?#host)(?P<host>(?:(?#named|IPv4)[A-Za-z0-9\-._~%]+|(?#IPv6)\[[A-Fa-f0-9:.]+\]|(?#IPvFuture)\[v[A-Fa-f0-9][A-Za-z0-9\-._~%!$&\'()*+,;=:]+\])?)
-  (?#port)(?::(?P<port>[0-9]+))?
+/^(?#scheme)(?:(?<scheme>[A-Za-z][A-Za-z0-9+\-.]*):)?
+(?:(?#authority)\/\/(?<authority>
+  (?#userinfo)(?:(?<userinfo>.+)@)?
+  (?#host)(?<host>(?:(?#named|IPv4)[A-Za-z0-9\-._~%]+|(?#IPv6)\[[A-Fa-f0-9:.]+\]|(?#IPvFuture)\[v[A-Fa-f0-9][A-Za-z0-9\-._~%!$&\'()*+,;=:]+\])?)
+  (?#port)(?::(?<port>[0-9]+))?
 (?::.+)?))?
-(?#path)(?:(?P<path>\/?(?:[A-Za-z0-9\-._~%!$&\'()*+,;=@]+\/?)*))?
-(?#query)(?:\??(?P<query>(?:[A-Za-z0-9\-._~%!$\'()*+,;:@\/?]*(?:=[A-Za-z0-9\-._~%!$\'()*+,;:@\/?]*)?)(?:&[A-Za-z0-9\-._~%!$\'()*+,;:@\/?]*(?:=[A-Za-z0-9\-._~%!$\'()*+,;:@\/?]*)?)*))?
-(?#fragment)(?:\#(?P<fragment>[A-Za-z0-9\-._~%!$&\'()*+,;=:@\/?]*))?$/x
+(?#path)(?:(?<path>\/?(?:[A-Za-z0-9\-._~%!$&\'()*+,;=@]+\/?)*))?
+(?#query)(?:\??(?<query>(?:[A-Za-z0-9\-._~%!$\'()*+,;:@\/?]*(?:=[A-Za-z0-9\-._~%!$\'()*+,;:@\/?]*)?)(?:&[A-Za-z0-9\-._~%!$\'()*+,;:@\/?]*(?:=[A-Za-z0-9\-._~%!$\'()*+,;:@\/?]*)?)*))?
+(?#fragment)(?:\#(?<fragment>[A-Za-z0-9\-._~%!$&\'()*+,;=:@\/?]*))?$/x
 REGEX;
 
     protected $_scheme = '';

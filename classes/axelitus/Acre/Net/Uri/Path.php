@@ -43,7 +43,7 @@ final class Path implements Countable, ArrayAccess, IteratorAggregate
      * @var string  The name capturing regex pattern to parse a path string
      */
     const REGEX = <<<REGEX
-/^(?#path)(?:(?P<path>\/?(?:[A-Za-z0-9\-._~%!$&\'()*+,;=@]+\/?)*))?(?:\?|\#|$)/x
+/^(?#path)(?:(?<path>\/?(?:[A-Za-z0-9\-._~%!$&\'()*+,;=@]+\/?)*))?(?:\?|\#|$)/x
 REGEX;
 
     /**

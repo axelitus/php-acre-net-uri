@@ -45,9 +45,9 @@ final class Authority
      */
     const REGEX = <<<REGEX
 /^(?:(?#authority)(?:\/\/)?
-  (?#userinfo)(?:(?P<userinfo>.+)@)?
-  (?#host)(?P<host>(?:(?#named|IPv4)[A-Za-z0-9\-._~%]+|(?#IPv6)\[[A-Fa-f0-9:.]+\]|(?#IPvFuture)\[v[A-Fa-f0-9][A-Za-z0-9\-._~%!$&\'()*+,;=:]+\])?)
-  (?#port)(?::(?P<port>[0-9]+))?
+  (?#userinfo)(?:(?<userinfo>.+)@)?
+  (?#host)(?<host>(?:(?#named|IPv4)[A-Za-z0-9\-._~%]+|(?#IPv6)\[[A-Fa-f0-9:.]+\]|(?#IPvFuture)\[v[A-Fa-f0-9][A-Za-z0-9\-._~%!$&\'()*+,;=:]+\])?)
+  (?#port)(?::(?<port>[0-9]+))?
 )?(?:\/|\?|\#|$)/x
 REGEX;
 
