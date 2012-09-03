@@ -306,7 +306,7 @@ REGEX;
      * Implements IteratorAggregate Interface
      *
      * @see     http://www.php.net/manual/en/class.iteratoraggregate.php     The IteratorAggregate interface
-     * @return  mixed
+     * @return  Traversable
      */
     public function getIterator()
     {
