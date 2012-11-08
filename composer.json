@@ -21,7 +21,7 @@
     },
     "autoload": {
         "psr-0": {
-            "axelitus\\Acre\\Net\\Uri": "classes/"
+            "axelitus\\Acre\\Net\\Uri": "src/"
         }
     }
 }
