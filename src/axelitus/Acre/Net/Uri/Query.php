@@ -54,7 +54,7 @@ REGEX;
     /**
      * @var array   The key/value pairs associative array
      */
-    protected $_pairs = array();
+    protected $pairs = array();
 
     /**
      * Protected constructor to prevent instantiation outside this class.
@@ -70,7 +70,7 @@ REGEX;
      * Forges a new instance of the Query class.
      *
      * @static
-     * @param string|array  $path$query     A query-formatted string or an array of key/value query pairs
+     * @param string|array  $query     A query-formatted string or an array of key/value query pairs
      * @return Query     The new instance
      * @throws \InvalidArgumentException
      */
@@ -89,15 +89,24 @@ REGEX;
      * Parses a query formatted string into a Query object.
      *
      * @static
-     * @param string    $query  The query-formatted string
+     * @param string    $query      The query-formatted string
+     * @param bool      $urldecode  Whether to decode the key-value pairs with urldecode
      * @return Authority    The new object
      * @throws \InvalidArgumentException
      */
     public static function parse($query, $urldecode = true)
     {
-        return static::forge(static::parseAsArray($query));
+        return static::forge(static::parseAsArray($query, $urldecode));
     }
 
+    /**
+     * Parses the query formatted string into an array.
+     *
+     * @param string    $query      The query-formatted string
+     * @param bool      $urldecode  Whether to decode the key-value pairs with urldecode
+     * @return array    The parsed array
+     * @throws \InvalidArgumentException
+     */
     public static function parseAsArray($query, $urldecode = true)
     {
         if (!static::validate($query, $matches)) {
@@ -106,16 +115,16 @@ REGEX;
 
         $assoc = array();
         if ($query != '') {
-            $queries = array_map(function($query) use (&$assoc, $urldecode)
-            {
+            array_map(function ($query) use (&$assoc, $urldecode) {
                 list($key, $value) = explode(Query::VALUE_SEPARATOR, $query) + array(null, null);
 
-                if($urldecode) {
+                if ($urldecode) {
                     $key = urldecode($key);
                     $value = urldecode(($value));
                 }
 
                 $assoc[$key] = $value;
+
                 return array($key => $value);
             }, explode(static::PAIR_SEPARATOR, isset($matches['query']) ? $matches['query'] : array()));
         }
@@ -131,6 +140,7 @@ REGEX;
      * @param string        $query      The query to test for validity
      * @param array|null    $matches    The named capturing groups from the match
      * @return bool     Whether the given query is valid
+     * @throws InvalidArgumentException
      */
     public static function validate($query, &$matches = null)
     {
@@ -148,7 +158,7 @@ REGEX;
      */
     public function load(array $pairs)
     {
-        $this->_pairs = array();
+        $this->pairs = array();
         foreach ($pairs as $key => $value) {
             $this->set($key, $value);
         }
@@ -159,6 +169,7 @@ REGEX;
      *
      * @param string    $key        The pair key
      * @param string    $value      The pair value
+     * @param bool      $urldecode  Whether to decode the key-value pairs with urldecode
      * @throws \OutOfBoundsException
      * @throws \InvalidArgumentException
      */
@@ -168,31 +179,33 @@ REGEX;
             throw new InvalidArgumentException("The \$key parameter must be a string.");
         }
 
-        if($urldecode){
+        if ($urldecode) {
             $key = urldecode($key);
             $value = urldecode($value);
         }
 
-        $this->_pairs[$key] = ($value !== null) ? $value : '';
+        $this->pairs[$key] = ($value !== null) ? $value : '';
     }
 
     /**
      * Gets the pairs array or a single pair
      *
-     * @param null|string   $key    The wanted pair key or null to get all pairs
+     * @param null|string   $key        The wanted pair key or null to get all pairs
+     * @param bool          $urlencode  Whether to encode the key-value pairs with urlencode
      * @return array|string     The pairs associative array or wanted pair
+     * @throws OutOfBoundsException
      */
     public function get($key = null, $urlencode = true)
     {
         if ($key === null) {
-            return $this->_pairs;
+            return $this->pairs;
         }
 
         if (!$this->has($key)) {
             throw new OutOfBoundsException(sprintf("Key %s does not exist.", $key));
         }
 
-        return ($urlencode)? urlencode($this->_pairs[urldecode($key)]) : $this->_pairs[$key];
+        return ($urlencode) ? urlencode($this->pairs[urldecode($key)]) : $this->pairs[$key];
     }
 
     /**
@@ -203,7 +216,7 @@ REGEX;
      */
     public function has($key)
     {
-        return array_key_exists($key, $this->_pairs);
+        return array_key_exists($key, $this->pairs);
     }
 
     /**
@@ -218,7 +231,7 @@ REGEX;
             throw new OutOfBoundsException(sprintf("Key %s does not exist.", $key));
         }
 
-        unset($this->_pairs[$key]);
+        unset($this->pairs[$key]);
     }
 
     //<editor-fold desc="Countable Interface">
@@ -230,7 +243,7 @@ REGEX;
      */
     public function count()
     {
-        return count($this->_pairs);
+        return count($this->pairs);
     }
 
     //</editor-fold>
@@ -292,11 +305,11 @@ REGEX;
      * Implements IteratorAggregate Interface
      *
      * @see     http://www.php.net/manual/en/class.iteratoraggregate.php     The IteratorAggregate interface
-     * @return  Traversable
+     * @return  \Traversable
      */
     public function getIterator()
     {
-        return new ArrayIterator($this->_pairs);
+        return new ArrayIterator($this->pairs);
     }
 
     //</editor-fold>
@@ -304,13 +317,14 @@ REGEX;
     /**
      * Builds the valid query-formatted string with the current values.
      *
+     * @param bool  $urlencode  Whether to encode the key-value pairs with urlencode
      * @return string   The query-formatted string
      */
     public function build($urlencode = true)
     {
         $query = '';
-        foreach ($this->_pairs as $key => $value) {
-            if($urlencode) {
+        foreach ($this->pairs as $key => $value) {
+            if ($urlencode) {
                 $key = urlencode($key);
                 $value = urlencode($value);
             }

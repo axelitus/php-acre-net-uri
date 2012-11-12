@@ -49,7 +49,7 @@ REGEX;
     /**
      * @var array   The path segments
      */
-    protected $_segments = array();
+    protected $segments = array();
 
     /**
      * Protected constructor to prevent instantiation outside this class.
@@ -140,7 +140,7 @@ REGEX;
      */
     public function load(array $segments)
     {
-        $this->_segments = array();
+        $this->segments = array();
         $this->add($segments);
     }
 
@@ -162,7 +162,7 @@ REGEX;
             throw new InvalidArgumentException("The \$segment parameter must be a string.");
         }
 
-        $this->_segments[$index] = $segment;
+        $this->segments[$index] = $segment;
     }
 
     /**
@@ -170,18 +170,19 @@ REGEX;
      *
      * @param null|int  $index      The wanted segment index or null to get all segments
      * @return array|string     The path segments or wanted segment
+     * @throws OutOfBoundsException
      */
     public function get($index = null)
     {
         if ($index === null) {
-            return $this->_segments;
+            return $this->segments;
         }
 
         if (!$this->has($index)) {
             throw new OutOfBoundsException(sprintf("Index %s does not exist.", $index));
         }
 
-        return $this->_segments[$index];
+        return $this->segments[$index];
     }
 
     /**
@@ -192,13 +193,14 @@ REGEX;
      */
     public function has($index)
     {
-        return array_key_exists($index, $this->_segments);
+        return array_key_exists($index, $this->segments);
     }
 
     /**
      * Adds a new segment (or multiple segments) to the end of the segments array.
      *
      * @param string|array  $segment      The new segment(s)
+     * @throws InvalidArgumentException
      */
     public function add($segment)
     {
@@ -215,7 +217,7 @@ REGEX;
             if (Str::contains($new_segment, static::SEPARATOR)) {
                 $this->add($new_segment);
             } else {
-                $this->_segments[] = $new_segment;
+                $this->segments[] = $new_segment;
             }
         }
     }
@@ -232,8 +234,8 @@ REGEX;
             throw new OutOfBoundsException(sprintf("Index %s does not exist.", $index));
         }
 
-        unset($this->_segments[$index]);
-        $this->_segments = array_Values($this->_segments);
+        unset($this->segments[$index]);
+        $this->segments = array_Values($this->segments);
     }
 
     //<editor-fold desc="Countable Interface">
@@ -245,7 +247,7 @@ REGEX;
      */
     public function count()
     {
-        return count($this->_segments);
+        return count($this->segments);
     }
 
     //</editor-fold>
@@ -297,7 +299,7 @@ REGEX;
      */
     public function offsetUnset($offset)
     {
-       $this->remove($offset);
+        $this->remove($offset);
     }
 
     //</editor-fold>
@@ -307,11 +309,11 @@ REGEX;
      * Implements IteratorAggregate Interface
      *
      * @see     http://www.php.net/manual/en/class.iteratoraggregate.php     The IteratorAggregate interface
-     * @return  Traversable
+     * @return  \Traversable
      */
     public function getIterator()
     {
-        return new ArrayIterator($this->_segments);
+        return new ArrayIterator($this->segments);
     }
 
     //</editor-fold>
@@ -324,7 +326,7 @@ REGEX;
     public function build()
     {
         $path = '';
-        foreach ($this->_segments as $segment) {
+        foreach ($this->segments as $segment) {
             $path .= sprintf("%s%s", $segment, static::SEPARATOR);
         }
 

@@ -45,16 +45,16 @@ class Uri extends MagicObject
 (?#fragment)(?:\#(?<fragment>[A-Za-z0-9\-._~%!$&\'()*+,;=:@\/?]*))?$/x
 REGEX;
 
-    protected $_scheme = '';
-    protected $_authority = null;
-    protected $_path = null;
-    protected $_query = null;
-    protected $_fragment = '';
+    protected $scheme = '';
+    protected $authority = null;
+    protected $path = null;
+    protected $query = null;
+    protected $fragment = '';
 
     /**
      * @var null    Virtual property not actually used
      */
-    protected $_components = null;
+    protected $components = null;
 
     /**
      * Protected constructor to prevent instantiation outside this class.
@@ -64,11 +64,11 @@ REGEX;
      */
     protected function __construct(array $components)
     {
-        $this->_scheme = $components['scheme'];
-        $this->_authority = $components['authority'];
-        $this->_path = $components['path'];
-        $this->_query = $components['query'];
-        $this->_fragment = $components['fragment'];
+        $this->scheme = $components['scheme'];
+        $this->authority = $components['authority'];
+        $this->path = $components['path'];
+        $this->query = $components['query'];
+        $this->fragment = $components['fragment'];
     }
 
     /**
@@ -137,7 +137,7 @@ REGEX;
      * Parses an URI if valid and return a components array.
      *
      * @static
-     * @param $uri      The URI to parse
+     * @param string    $uri      The URI to parse
      * @return Uri
      * @throws \InvalidArgumentException
      */
@@ -152,11 +152,11 @@ REGEX;
         }
 
         $components = array(
-            'scheme'    => isset($matches['scheme']) ? $matches['scheme'] : '',
+            'scheme' => isset($matches['scheme']) ? $matches['scheme'] : '',
             'authority' => isset($matches['authority']) ? $matches['authority'] : array(),
-            'path'      => isset($matches['path']) ? $matches['path'] : array(),
-            'query'     => isset($matches['query']) ? $matches['query'] : array(),
-            'fragment'  => isset($matches['fragment']) ? $matches['fragment'] : ''
+            'path' => isset($matches['path']) ? $matches['path'] : array(),
+            'query' => isset($matches['query']) ? $matches['query'] : array(),
+            'fragment' => isset($matches['fragment']) ? $matches['fragment'] : ''
         );
 
         return static::forge($components);
@@ -187,7 +187,7 @@ REGEX;
             throw new InvalidArgumentException("The \$scheme parameter must be a string.");
         }
 
-        $this->_scheme = $scheme;
+        $this->scheme = $scheme;
     }
 
     /**
@@ -197,7 +197,7 @@ REGEX;
      */
     public function getScheme()
     {
-        return $this->_scheme;
+        return $this->scheme;
     }
 
     /**
@@ -207,7 +207,7 @@ REGEX;
      */
     public function setAuthority(Authority $authority)
     {
-        $this->_authority = $authority;
+        $this->authority = $authority;
     }
 
     /**
@@ -218,7 +218,7 @@ REGEX;
      */
     public function getAuthority($asString = true)
     {
-        return ($asString) ? (string)$this->_authority : $this->_authority;
+        return ($asString) ? (string)$this->authority : $this->authority;
     }
 
     /**
@@ -228,7 +228,7 @@ REGEX;
      */
     public function setPath(Path $path)
     {
-        $this->_path = $path;
+        $this->path = $path;
     }
 
     /**
@@ -239,7 +239,7 @@ REGEX;
      */
     public function getPath($asString = true)
     {
-        return ($asString) ? (string)$this->_path : $this->_path;
+        return ($asString) ? (string)$this->path : $this->path;
     }
 
     /**
@@ -249,7 +249,7 @@ REGEX;
      */
     public function setQuery(Query $query)
     {
-        $this->_query = $query;
+        $this->query = $query;
     }
 
     /**
@@ -260,7 +260,7 @@ REGEX;
      */
     public function getQuery($asString = true)
     {
-        return ($asString) ? (string)$this->_query : $this->_query;
+        return ($asString) ? (string)$this->query : $this->query;
     }
 
     /**
@@ -275,7 +275,7 @@ REGEX;
             throw new InvalidArgumentException("The \$fragment parameter must be a string.");
         }
 
-        $this->_fragment = $fragment;
+        $this->fragment = $fragment;
     }
 
     /**
@@ -285,7 +285,7 @@ REGEX;
      */
     public function getFragment()
     {
-        return $this->_fragment;
+        return $this->fragment;
     }
 
     /**
@@ -298,11 +298,11 @@ REGEX;
     {
         //var_dump($this); exit;
         return array(
-            'scheme'    => $this->_scheme,
+            'scheme' => $this->scheme,
             'authority' => $this->getAuthority($objAsStrings),
-            'path'      => $this->getPath($objAsStrings),
-            'query'     => $this->getQuery($objAsStrings),
-            'fragment'  => $this->_fragment
+            'path' => $this->getPath($objAsStrings),
+            'query' => $this->getQuery($objAsStrings),
+            'fragment' => $this->fragment
         );
     }
 
@@ -313,14 +313,14 @@ REGEX;
      */
     protected function build()
     {
-        $uri = $this->_scheme;
-        $uri .= ($uri != '' ? static::SCHEME_SEPARATOR : '').(string)$this->_authority;
+        $uri = $this->scheme;
+        $uri .= ($uri != '' ? static::SCHEME_SEPARATOR : '').(string)$this->authority;
 
-        $path = (string)$this->_path;
+        $path = (string)$this->path;
         $uri .= (($uri != '' and !Str::beginsWith($path, Path::SEPARATOR)) ? Path::SEPARATOR : '').$path;
 
-        $uri .= (string)$this->_query;
-        $uri .= $this->_fragment != '' ? '#'.$this->_fragment : '';
+        $uri .= (string)$this->query;
+        $uri .= $this->fragment != '' ? '#'.$this->fragment : '';
 
         return $uri;
     }

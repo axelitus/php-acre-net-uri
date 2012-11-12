@@ -54,17 +54,17 @@ REGEX;
     /**
      * @var string      The userinfo segment
      */
-    protected $_userinfo = '';
+    protected $userinfo = '';
 
     /**
      * @var string      The host segment
      */
-    protected $_host = '';
+    protected $host = '';
 
     /**
      * @var int         The port segment (as an integer)
      */
-    protected $_port = 0;
+    protected $port = 0;
 
     /**
      * Protected constructor to prevent instantiation outside this class.
@@ -75,7 +75,7 @@ REGEX;
     protected function __construct(array $components)
     {
         foreach ($components as $component => $value) {
-            if(Str::isOneOf($component, array('host', 'port', 'userinfo'))) {
+            if (Str::isOneOf($component, array('host', 'port', 'userinfo'))) {
                 $this->{'set'.$component}($value);
             }
         }
@@ -115,8 +115,8 @@ REGEX;
 
         $components = array(
             'userinfo' => isset($matches['userinfo']) ? $matches['userinfo'] : '',
-            'host'     => isset($matches['host']) ? $matches['host'] : '',
-            'port'     => isset($matches['port']) ? (int)$matches['port'] : 0
+            'host' => isset($matches['host']) ? $matches['host'] : '',
+            'port' => isset($matches['port']) ? (int)$matches['port'] : 0
         );
 
         return static::forge($components);
@@ -130,6 +130,7 @@ REGEX;
      * @param string        $authority  The path to test for validity
      * @param array|null    $matches    The named capturing groups from the match
      * @return bool     Whether the given path is valid
+     * @throws InvalidArgumentException
      */
     public static function validate($authority, &$matches = null)
     {
@@ -154,7 +155,7 @@ REGEX;
             throw new InvalidArgumentException("The \$userinfo parameter must be a string.");
         }
 
-        $this->_userinfo = $userinfo;
+        $this->userinfo = $userinfo;
 
         return $this;
     }
@@ -166,7 +167,7 @@ REGEX;
      */
     public function getUserinfo()
     {
-        return $this->_userinfo;
+        return $this->userinfo;
     }
 
     /**
@@ -183,7 +184,7 @@ REGEX;
             throw new InvalidArgumentException("The \$host parameter must be a string.");
         }
 
-        $this->_host = $host;
+        $this->host = $host;
 
         return $this;
     }
@@ -195,7 +196,7 @@ REGEX;
      */
     public function getHost()
     {
-        return $this->_host;
+        return $this->host;
     }
 
     /**
@@ -211,7 +212,7 @@ REGEX;
             throw new InvalidArgumentException("The \$port parameter must be an integer.");
         }
 
-        $this->_port = $port;
+        $this->port = $port;
 
         return $this;
     }
@@ -223,7 +224,7 @@ REGEX;
      */
     public function getPort()
     {
-        return $this->_port;
+        return $this->port;
     }
 
     /**
@@ -233,10 +234,10 @@ REGEX;
      */
     protected function build()
     {
-        $userinfo = $this->_userinfo.(($this->_userinfo != '') ? static::USERINFO_SEPARATOR : '');
-        $port = $this->_port > 0 ? static::PORT_SEPARATOR.$this->_port : '';
+        $userinfo = $this->userinfo.(($this->userinfo != '') ? static::USERINFO_SEPARATOR : '');
+        $port = $this->port > 0 ? static::PORT_SEPARATOR.$this->port : '';
 
-        $authority = sprintf("%s%s%s", $userinfo, $this->_host, $port);
+        $authority = sprintf("%s%s%s", $userinfo, $this->host, $port);
 
         return ($authority != '') ? '//'.$authority : $authority;
     }
