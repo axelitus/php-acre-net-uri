@@ -166,11 +166,12 @@ REGEX;
      * Tests if the given URI is valid (using the regex). It can additionally return the named capturing group(s)
      * using the $matches parameter as a reference.
      *
+     * @static
      * @param string        $uri          The URI to test for validity
-     * @param array|null    $matches      The named capturing groups from the match
+     * @param null|array    $matches      The named capturing groups from the match
      * @return bool     Whether the given URI is valid
      */
-    public static function validate($uri, &$matches)
+    public static function validate($uri, &$matches = null)
     {
         return (bool)preg_match(static::REGEX, $uri, $matches);
     }

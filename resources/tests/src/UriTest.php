@@ -10,6 +10,8 @@ class UriTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Tests Uri::parse()
+     *
      * @test
      */
     public function testUriParse()
@@ -38,7 +40,8 @@ class UriTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @depends testUriParse
+     * Tests Uri::forge()
+     *
      * @test
      */
     public function testUriForge()
@@ -54,14 +57,19 @@ class UriTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $output);
     }
 
+    /**
+     * Tests Uri::validate()
+     *
+     * @test
+     */
     public function testUriValidate()
     {
 
     }
 
     /**
-     * @depends testUriParse
-     * @depends testUriForge
+     * Tests Uri::__toString()
+     *
      * @test
      */
     public function testUriToString()

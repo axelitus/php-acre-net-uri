@@ -10,6 +10,8 @@ class AuthorityTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Tests Authority::forge()
+     *
      * @test
      */
     public function testAuthorityForge()
@@ -20,6 +22,11 @@ class AuthorityTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('//'.$expected, $output);
     }
 
+    /**
+     * Tests Authority::parse()
+     *
+     * @test
+     */
     public function testAuthorityParse()
     {
         $expected = 'myusr:mypwd@myhost:80';

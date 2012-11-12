@@ -102,6 +102,7 @@ REGEX;
     /**
      * Parses the query formatted string into an array.
      *
+     * @static
      * @param string    $query      The query-formatted string
      * @param bool      $urldecode  Whether to decode the key-value pairs with urldecode
      * @return array    The parsed array
