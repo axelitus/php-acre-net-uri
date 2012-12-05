@@ -217,7 +217,7 @@ REGEX;
      * @param bool $asString    Whether to return the object as a string
      * @return string|Authority     The Authority object or its string representation
      */
-    public function getAuthority($asString = true)
+    public function getAuthority($asString = false)
     {
         return ($asString) ? (string)$this->authority : $this->authority;
     }
@@ -238,7 +238,7 @@ REGEX;
      * @param bool $asString    Whether to return the object as a string
      * @return string|Path      The Path object or its string representation
      */
-    public function getPath($asString = true)
+    public function getPath($asString = false)
     {
         return ($asString) ? (string)$this->path : $this->path;
     }
@@ -259,7 +259,7 @@ REGEX;
      * @param bool $asString    Whether to return the object as a string
      * @return string|Query     The Query object or its string representation
      */
-    public function getQuery($asString = true)
+    public function getQuery($asString = false)
     {
         return ($asString) ? (string)$this->query : $this->query;
     }
