@@ -165,5 +165,10 @@ class UriTest extends \PHPUnit_Framework_TestCase
         $uri = Uri::forge($expected);
         $output = (string)$uri;
         $this->assertEquals($expected, $output);
+
+        $expected = 'http://myuser:mypwd@myhost:80';
+        $output = $uri->schemedAuthority;
+        $this->assertEquals($expected, $output);
+
     }
 }

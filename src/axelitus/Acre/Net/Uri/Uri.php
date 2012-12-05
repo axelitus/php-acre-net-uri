@@ -52,6 +52,11 @@ REGEX;
     protected $fragment = '';
 
     /**
+     * @var null virtual property
+     */
+    protected $schemedAuthority = null;
+
+    /**
      * @var null    Virtual property not actually used
      */
     protected $components = null;
@@ -223,6 +228,16 @@ REGEX;
     }
 
     /**
+     * Schemed Authority getter
+     *
+     * @return string   The schemed authority
+     */
+    public function getSchemedAuthority()
+    {
+        return $this->buildSchemedAuthority();
+    }
+
+    /**
      * Path setter.
      *
      * @param Path $path
@@ -308,14 +323,26 @@ REGEX;
     }
 
     /**
+     * Builds the valid scheme + authority URI part with the current components
+     *
+     * @return string   The URI scheme + authority
+     */
+    protected function buildSchemedAuthority()
+    {
+        $uri = $this->scheme;
+        $uri .= ($uri != '' ? static::SCHEME_SEPARATOR : '').(string)$this->authority;
+
+        return $uri;
+    }
+
+    /**
      * Builds the valid URI string with the current components.
      *
      * @return string   The URI string
      */
     protected function build()
     {
-        $uri = $this->scheme;
-        $uri .= ($uri != '' ? static::SCHEME_SEPARATOR : '').(string)$this->authority;
+        $uri = $this->buildSchemedAuthority();
 
         $path = (string)$this->path;
         $uri .= (($uri != '' and !Str::beginsWith($path, Path::SEPARATOR)) ? Path::SEPARATOR : '').$path;
