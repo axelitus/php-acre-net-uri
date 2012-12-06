@@ -53,6 +53,11 @@ final class Authority extends MagicObject
 REGEX;
 
     /**
+     * @var int         The default value of the port when none given
+     */
+    const DEFAULT_PORT = 80;
+
+    /**
      * @var string      The userinfo segment
      */
     protected $userinfo = '';
@@ -213,6 +218,10 @@ REGEX;
             throw new InvalidArgumentException("The \$port parameter must be an integer.");
         }
 
+        if (!Num::between($port, 0, 65535, Num::RANGE_BOTH_INCLUSIVE)) {
+            throw new InvalidArgumentException("Valid \$port parameters are between 0 and 65535.");
+        }
+
         $this->port = $port;
 
         return $this;
@@ -223,9 +232,9 @@ REGEX;
      *
      * @return int      The port segment value
      */
-    public function getPort()
+    public function getPort($defaultOnNull = true)
     {
-        return $this->port;
+        return ($this->port === 0 and $defaultOnNull) ? self::DEFAULT_PORT : $this->port;
     }
 
     /**
@@ -236,7 +245,7 @@ REGEX;
     protected function build()
     {
         $userinfo = $this->userinfo.(($this->userinfo != '') ? static::USERINFO_SEPARATOR : '');
-        $port = $this->port > 0 ? static::PORT_SEPARATOR.$this->port : '';
+        $port = $this->getPort(false) > 0 ? static::PORT_SEPARATOR.$this->port : '';
 
         $authority = sprintf("%s%s%s", $userinfo, $this->host, $port);
 
