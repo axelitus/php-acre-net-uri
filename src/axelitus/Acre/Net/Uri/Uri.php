@@ -312,7 +312,6 @@ REGEX;
      */
     public function getComponents($objAsStrings = true)
     {
-        //var_dump($this); exit;
         return array(
             'scheme' => $this->scheme,
             'authority' => $this->getAuthority($objAsStrings),
