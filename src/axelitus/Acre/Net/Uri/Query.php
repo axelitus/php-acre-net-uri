@@ -321,11 +321,11 @@ REGEX;
      * @param bool  $urlencode  Whether to encode the key-value pairs with urlencode
      * @return string   The query-formatted string
      */
-    public function build($urlencode = true)
+    public function build(array $options = array())
     {
         $query = '';
         foreach ($this->pairs as $key => $value) {
-            if ($urlencode) {
+            if (array_key_exists('urlencode', $options) and $options['urlencode'] == true) {
                 $key = urlencode($key);
                 $value = urlencode($value);
             }

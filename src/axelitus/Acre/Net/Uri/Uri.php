@@ -234,7 +234,11 @@ REGEX;
      */
     public function getSchemedAuthority()
     {
-        return $this->buildSchemedAuthority();
+        return $this->build(array(
+                                 'path' => false,
+                                 'query' => false,
+                                 'fragment' => false
+                            ));
     }
 
     /**
@@ -322,34 +326,45 @@ REGEX;
     }
 
     /**
-     * Builds the valid scheme + authority URI part with the current components
-     *
-     * @return string   The URI scheme + authority
-     */
-    protected function buildSchemedAuthority()
-    {
-        $uri = $this->scheme;
-        $uri .= ($uri != '' ? static::SCHEME_SEPARATOR : '').(string)$this->authority;
-
-        return $uri;
-    }
-
-    /**
      * Builds the valid URI string with the current components.
      *
      * @return string   The URI string
      */
-    protected function build()
+    public function build(array $options = array())
     {
-        $uri = $this->buildSchemedAuthority();
+        $options = $this->validateBuildOptions($options);
 
-        $path = (string)$this->path;
-        $uri .= (($uri != '' and !Str::beginsWith($path, Path::SEPARATOR)) ? Path::SEPARATOR : '').$path;
+        $uri = (!($exists = array_key_exists('scheme', $options)) or ($exists and $options['scheme'] == true))
+            ? $this->scheme.static::SCHEME_SEPARATOR
+            : '';
 
-        $uri .= (string)$this->query;
-        $uri .= $this->fragment != '' ? '#'.$this->fragment : '';
+        if (!($exists = array_key_exists('authority', $options)) or ($exists and $options['authority'] == true)) {
+            $uri .= $this->authority->build($options);
+        }
+
+        if (!($exists = array_key_exists('path', $options)) or ($exists and $options['path'] == true)) {
+            $path = $this->path->build($options);
+            $uri .= (($uri != '' and !Str::beginsWith($path, Path::SEPARATOR)) ? Path::SEPARATOR : '').$path;
+        }
+
+        if (!($exists = array_key_exists('query', $options)) or ($exists and $options['query'] == true)) {
+            $uri .= $this->query->build($options);
+        }
+
+        if (!($exists = array_key_exists('fragment', $options)) or ($exists and $options['fragment'] == true)) {
+            $uri .= $this->fragment != '' ? '#'.$this->fragment : '';
+        }
 
         return $uri;
+    }
+
+    protected function validateBuildOptions(array $options)
+    {
+        if ($this->scheme == '') {
+            $options['scheme'] = false;
+        }
+
+        return $options;
     }
 
     /**

@@ -242,14 +242,42 @@ REGEX;
      *
      * @return string   The authority-formatted string
      */
-    protected function build()
+    public function build(array $options = array())
     {
-        $userinfo = $this->userinfo.(($this->userinfo != '') ? static::USERINFO_SEPARATOR : '');
-        $port = $this->getPort(false) > 0 ? static::PORT_SEPARATOR.$this->port : '';
+        $options = $this->validateBuildOptions($options);
+
+        $userinfo = (!($exists = array_key_exists('userinfo', $options)) or ($exists and $options['userinfo'] == true))
+            ? ($this->userinfo.(($this->userinfo != '')
+                ? static::USERINFO_SEPARATOR
+                : ''))
+            : '';
+        $port = (!($exists = array_key_exists('port', $options)) or ($exists and $options['port'] == true))
+            ? (($this->getPort(false) > 0)
+                ? static::PORT_SEPARATOR.$this->port
+                : ((!($exists = array_key_exists('omit_default_port', $options)) or ($exists and $options['omit_default_port'] == true))
+                    ? ''
+                    : static::DEFAULT_PORT))
+            : '';
 
         $authority = sprintf("%s%s%s", $userinfo, $this->host, $port);
 
         return ($authority != '') ? '//'.$authority : $authority;
+    }
+
+    protected function validateBuildOptions(array $options)
+    {
+        // userinfo
+        if($this->userinfo == '') {
+            $options['userinfo'] = false;
+        }
+
+        // port
+        // do nothing
+
+        // omit_default_port
+        // do nothing
+
+        return $options;
     }
 
     /**

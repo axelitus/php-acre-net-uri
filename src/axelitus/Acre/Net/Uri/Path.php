@@ -323,14 +323,24 @@ REGEX;
      *
      * @return string   The path-formatted string
      */
-    public function build()
+    public function build(array $options = array())
     {
         $path = '';
         foreach ($this->segments as $segment) {
+            $segment = (array_key_exists('urlencode', $options) and $options['urlencode'] == true)
+                ? urlencode($segment)
+                : $segment;
             $path .= sprintf("%s%s", $segment, static::SEPARATOR);
         }
 
         return Str::sub($path, 0, -1);
+    }
+
+    public function validateBuildOptions(array $options)
+    {
+
+
+        return $options;
     }
 
     /**
