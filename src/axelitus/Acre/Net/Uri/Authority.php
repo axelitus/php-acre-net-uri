@@ -256,7 +256,7 @@ REGEX;
                 ? static::PORT_SEPARATOR.$this->port
                 : ((!($exists = array_key_exists('omit_default_port', $options)) or ($exists and $options['omit_default_port'] == true))
                     ? ''
-                    : static::DEFAULT_PORT))
+                    : static::PORT_SEPARATOR.static::DEFAULT_PORT))
             : '';
 
         $authority = sprintf("%s%s%s", $userinfo, $this->host, $port);
